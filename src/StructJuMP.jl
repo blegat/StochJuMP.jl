@@ -82,12 +82,12 @@ default_probability(::Void) = 1.0
 # ---------------
 
 # Constructor with the number of scenarios
-function StructuredModel(;solver=JuMP.UnsetSolver(), parent=nothing, same_children_as=nothing, id=0, comm=MPI.Comm(-1), num_scenarios::Int=0, prob::Float64=default_probability(parent))
+function StructuredModel(;solver=JuMP.UnsetSolver(), parent=nothing, same_children_as=nothing, id=0, comm=isdefined(:MPI) ? MPI.Comm(-1) : -1, num_scenarios::Int=0, prob::Float64=default_probability(parent))
     m = JuMP.Model(solver=solver)
     if parent === nothing
         id = 0
         if isdefined(:MPI)
-            mpiWrapper.init(comm)
+            mpiWrapper.init(MPI.Comm(comm))
         end
         if isdefined(:StructJuMPSolverInterface)
             JuMP.setsolvehook(m,StructJuMPSolverInterface.sj_solve)
